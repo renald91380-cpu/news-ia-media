@@ -4,6 +4,7 @@ import os, datetime
 # ====== CONTENU DU JOUR (seule partie à modifier) ======
 DATE = "Lundi 5 octobre"
 ACCROCHE = "Google, OpenAI et un robot : 3 actus IA à connaître"
+ACCROCHE_EN = "Google, OpenAI and a robot: 3 AI news to know"  # traduction affichée sous l'accroche ("" pour aucune)
 NEWS = [
     dict(tag="GOOGLE", titre="Gemini 4 Argon débarque",
          points=["Le nouveau modèle de Google est d'abord réservé aux experts en cybersécurité.",
@@ -95,9 +96,15 @@ total = len(NEWS) + 2
 # --- page 1 : couverture
 img, d = page()
 fd = font(False, 40); d.text((W - M - d.textlength(DATE, font=fd), M + 24), DATE, font=fd, fill=SOFT)
+EN = globals().get("ACCROCHE_EN", "").strip()
 ft = font(True, 104); lines = wrap(d, ACCROCHE, ft, mw)
-if len(lines) > 5: ft = font(True, 88); lines = wrap(d, ACCROCHE, ft, mw)
-block(d, [(lines, ft, WHITE, int(ft.size*1.08), 0, False)])
+if len(lines) > (4 if EN else 5): ft = font(True, 88); lines = wrap(d, ACCROCHE, ft, mw)
+cover = [(lines, ft, WHITE, int(ft.size*1.08), 0, False)]
+if EN:
+    fe = font(False, 52)
+    cover[0] = cover[0][:4] + (48, False)
+    cover.append((wrap(d, "EN · " + EN, fe, mw), fe, ACC, 66, 0, False))
+block(d, cover)
 footer(d, "L’actu IA en 1 minute", "Fais défiler  →")
 save(img, 1)
 # --- pages actus
