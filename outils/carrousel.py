@@ -124,12 +124,20 @@ def pages_spec():
         num = f"{i}/{len(NEWS)}"
         def bg(d, num=num):
             fn = font(True, 40); d.text((W - M - d.textlength(num, font=fn), M + TOP + sc(24)), num, font=fn, fill=SOFT)
-        ftag, ft, fb = font(True, 34), font(True, 84), font(False, 44)
-        tl = wrap(d, n["titre"], ft, mw)
-        if len(tl) > 3: ft = font(True, 72); tl = wrap(d, n["titre"], ft, mw)
-        parts = [([" ".join(n["tag"].upper())], ftag, ACC, sc(34), sc(28), False),
-                 (tl, ft, WHITE, int(ft.size*1.08), sc(60), False)]
-        parts += [(wrap(d, p, fb, mw - sc(54)), fb, SOFT, sc(62), sc(34), True) for p in n["points"]]
+        # Taille adaptative : on réduit titre puis texte jusqu'à ce que tout tienne
+        # (permet 3 phrases plus longues par actu sans « Texte trop long »).
+        ftag = font(True, 34)
+        for tsz, bsz in ((84, 44), (76, 42), (72, 40), (68, 38), (64, 36)):
+            ft, fb = font(True, tsz), font(False, bsz)
+            tl = wrap(d, n["titre"], ft, mw)
+            lhb = int(fb.size * 1.41)
+            parts = [([" ".join(n["tag"].upper())], ftag, ACC, sc(34), sc(28), False),
+                     (tl, ft, WHITE, int(ft.size*1.08), sc(60 if bsz >= 40 else 48), False)]
+            parts += [(wrap(d, p, fb, mw - sc(54)), fb, SOFT, lhb, sc(34 if bsz >= 40 else 28), True)
+                      for p in n["points"]]
+            h = sum(len(l) * lh + gap for l, f, c, lh, gap, b in parts) - parts[-1][4]
+            if len(tl) <= 3 and h <= (H - BOT - 186) - (M + TOP + sc(132)):
+                break
         specs.append((bg, parts, ("Source : " + n["source"], "→"), list(range(2, len(parts) + 1))))
     # --- récap + appel à l'action
     fh, fl, fc = font(True, 34), font(True, 50), font(True, 62)
@@ -162,7 +170,7 @@ for k, spec in enumerate(pages_spec(), 1):
         p = os.path.join(RD, f"{k:02d}_{s}.png"); render(spec, upto).save(p)
         words = sum(len(" ".join(l).split()) for l, *_ in spec[1][:upto])
         new = words - prev_words; prev_words = words
-        dur = 1.4 if (k == 1 and s == 1) else min(2.6, max(1.0, 0.4 + 0.13 * new))
+        dur = 1.4 if (k == 1 and s == 1) else min(4.2, max(1.0, 0.5 + 0.19 * new))   # ~5 mots/s
         stages.append({"file": os.path.basename(p), "dur": round(dur, 2)})
     if k == len(NEWS) + 2: stages[-1]["dur"] += 0.8   # laisser lire l'appel à l'action
     manifest.append(stages)
