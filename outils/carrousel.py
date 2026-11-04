@@ -93,7 +93,12 @@ def block(d, parts, upto=None):
             d.rounded_rectangle((M, y + o, M + s, y + o + s), radius=5, fill=ACC)
         for ln in lines:
             assert d.textlength(ln, font=f) <= W - 2*M, ln
-            if draw:
+            if draw and col == WHITE and not bullet:   # titres : chiffres mis en couleur d'accent
+                x = M
+                for w in ln.split(" "):
+                    d.text((x, y), w, font=f, fill=ACC if any(ch.isdigit() for ch in w) else col)
+                    x += d.textlength(w + " ", font=f)
+            elif draw:
                 d.text((M + (int(54 * SCALE) if bullet else 0), y), ln, font=f, fill=col)
             y += lh
         y += gap
