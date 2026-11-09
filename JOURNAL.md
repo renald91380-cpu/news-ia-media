@@ -2,7 +2,7 @@
 
 Suivi du projet : décisions, réglages, chiffres et prochaines étapes.
 À lire en premier avant toute modification des scripts ou des tâches programmées.
-Dernière mise à jour : lundi 9 novembre 2026.
+Dernière mise à jour : lundi 9 novembre 2026 (soir).
 
 ---
 
@@ -10,10 +10,10 @@ Dernière mise à jour : lundi 9 novembre 2026.
 
 | Élément | Valeur |
 | --- | --- |
-| Comptes | Instagram et Threads @renald91150, TikTok @dimahako |
+| Comptes | TikTok @dimahako et Threads @renald91150 en automatique ; Instagram @renald91150 seulement à la main |
 | Outil de publication | Metricool (marque 7238534), 20 publications par mois au maximum |
 | Hébergement des fichiers | ce dépôt, liens `raw.githubusercontent.com/.../main/<dossier>/reel.mp4` |
-| Format | vidéo courte 9:16 d'environ 15 s, la même sur les 3 réseaux |
+| Format | vidéo courte 9:16 d'environ 15 s, la même sur TikTok et Threads |
 | Heure | 10h00 (meilleur créneau Instagram selon Metricool, 18h en second) |
 
 ### Calendrier automatique
@@ -64,6 +64,7 @@ Contenus publiés à la main hors Metricool. Chaque dossier contient les images,
 | 4 nov. | Une seule vidéo pour les 3 réseaux, pas de version séparée pour Instagram | Une 2e publication par jour dépasserait le quota de 20 |
 | 4 nov. | Spéciales création du mercredi remplacées par une édition Indonésie et une édition Chine par mois | Demande de Renald |
 | 9 nov. | Ajout d'un carrousel manuel par semaine, publié dans l'app | Toucher les abonnés sans consommer le quota |
+| 9 nov. | **Instagram retiré des publications automatiques** (tâches + post du 10 nov.) | 2 à 62 vues par Reel, aucune progression |
 
 ---
 
@@ -85,6 +86,27 @@ Contenus publiés à la main hors Metricool. Chaque dossier contient les images,
 | 9 nov. | à relever | à relever |
 
 À refaire vers le 20 novembre, avec au moins 8 vidéos courtes, avant de conclure.
+
+### Analyse du 9 novembre : ce qui fait des vues
+
+**TikTok (le moteur du compte)** : socle d'environ 230 à 270 vues quel que soit le contenu.
+
+| Vues | Date | Format | Sujet |
+| --- | --- | --- | --- |
+| 769 | 16 oct. | vidéo 16 s | « Ton perso IA reste le même d'un plan à l'autre » (problème de créateur résolu) |
+| 766 | 13 oct. | diaporama photo | 3 news IA générales (jeu vidéo en 30 min) |
+| 743 | 13 oct. | diaporama photo | Édition Indonésie |
+| 418 | 27 oct. | vidéo 26 s | Siri parle enfin français |
+| 303 | 6 oct. | diaporama photo | IA en visio prise pour un humain |
+| 229 à 238 | 3 et 4 nov. | vidéo 47 à 54 s | les plus faibles : formats longs |
+
+Likes : 0 à 5 par vidéo, commentaires : 0. Les gens regardent mais n'interagissent pas.
+
+**Threads** : les images et carrousels font 94 à 176 vues (4, 6, 13 et 14 oct.), les vidéos 5 à 70, sauf Mistral (148, angle français).
+
+**Instagram** : Reels 2 à 62 vues, carrousels 19 à 57 vues (portée 7 à 17 personnes). Meilleur Reel : l'agence IA open source avec lien GitHub (62), une ressource utile plutôt qu'un résumé d'actus.
+
+**Constats** : le diaporama photo et les vidéos courtes battent les vidéos longues sur TikTok ; un sujet unique et concret bat le « 3 news » ; l'angle français et l'Indonésie marchent ; Threads préfère l'image à la vidéo.
 
 ---
 
@@ -133,7 +155,8 @@ Liste de 10 comptes à constituer : 5 grands comptes IA ou montage, 3 comptes de
 
 ## 7. À faire
 
-- [ ] Renald : passer Instagram en compte professionnel relié à une Page Facebook (débloque les sons tendance).
+- [ ] Décider : alterner vidéo courte et diaporama photo sur TikTok + Threads (les diaporamas ont fait 740 à 770 vues).
+- [ ] Renald : passer Instagram en compte professionnel relié à une Page Facebook (débloque les sons tendance), si Instagram doit repartir un jour.
 - [ ] Renald : publier le carrousel jeudi 12 novembre à 18h et répondre aux commentaires dans l'heure.
 - [ ] Renald : envoyer la liste des comptes suivis pour la routine de commentaires.
 - [ ] Vérifier pourquoi aucune publication n'est partie le 5 novembre.
