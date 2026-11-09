@@ -30,11 +30,25 @@ UI = {
     "id": dict(badge="NEWS AI", cover=("Berita AI dalam 1 menit", "Geser  →"), source="Sumber: ",
                recap="INTINYA", cta="Simpan postingan ini & follow untuk update AI berikutnya.",
                end=("Follow untuk update berikutnya", "#BeritaAI")),
+    "en": dict(badge="AI NEWS", cover=("AI news in 1 minute", "Swipe  →"), source="Source: ",
+               recap="KEY POINTS", cta="Save this post and follow for daily AI news.",
+               end=("Follow for more", "#AINews")),
+    "th": dict(badge="ข่าว AI", cover=("ข่าว AI ใน 1 นาที", "ปัดดู  >"), source="ที่มา: ",
+               recap="สรุป", cta="กดบันทึกโพสต์นี้ แล้วติดตามข่าว AI ทุกวัน",
+               end=("ติดตามเพื่อดูข่าวต่อไป", "#ข่าวAI")),
     "zh": dict(badge="AI 快讯", cover=("1 分钟看懂 AI 新闻", "向左滑  →"), source="来源：",
                recap="要点回顾", cta="收藏本条，关注我，每天了解 AI 新动态。",
                end=("关注我，获取更多 AI 资讯", "#AI快讯")),
 }[LANG]
 CJK = LANG == "zh"
+THAI = LANG == "th"
+FONTS_DIR = ""   # dossier outils/fonts du dépôt (à renseigner si le script est copié ailleurs)
+
+def _fonts_dirs():
+    import glob
+    here = os.path.dirname(os.path.abspath(__file__))
+    return [d for d in [FONTS_DIR, os.path.join(here, "fonts"), os.path.join(here, "outils", "fonts")]
+            + glob.glob(os.path.expanduser("~/**/news-ia-media/outils/fonts"), recursive=True) if d]
 
 W, H, M = 1080, 1350, 84
 ACCENTS = [(86, 156, 255), (46, 211, 162), (255, 168, 60), (255, 99, 132),
@@ -46,6 +60,12 @@ TOP, BOT, SCALE = 0, 0, 1.0   # marges de sécurité et échelle (modifiées pou
 
 def font(bold, size):
     size = int(round(size * SCALE))
+    if THAI:   # Noto Sans Thai (latin + thaï), livrée dans outils/fonts
+        for d_ in _fonts_dirs():
+            p = os.path.join(d_, "NotoSansThai-" + ("ExtraBold" if bold else "Regular") + ".ttf")
+            if os.path.exists(p):
+                return ImageFont.truetype(p, size)
+        raise SystemExit("Police thaïe introuvable : renseigner FONTS_DIR = '<dépôt>/outils/fonts'")
     if CJK:
         p = "/usr/share/fonts/opentype/noto/NotoSansCJK-" + ("Black" if bold else "Regular") + ".ttc"
         if os.path.exists(p):
@@ -62,7 +82,25 @@ def fix(t):  # apostrophes typographiques + espaces insécables avant : ? ! »
         t = t.replace(" " + c, chr(160) + c)
     return t.replace("« ", "«" + chr(160))
 
+THAI_MARKS = set(chr(c) for c in list(range(0x0E31, 0x0E32)) + list(range(0x0E34, 0x0E3B)) + list(range(0x0E47, 0x0E4F)))
+
 def wrap(d, text, f, maxw):
+    if THAI:   # coupure aux espaces ou aux espaces de largeur nulle (U+200B), sinon entre grappes
+        lines, cur, sep = [], "", ""
+        for tok in re.findall(r"[^ \u200b]+|[ \u200b]+", text.strip()):
+            if not tok.strip(" \u200b"):
+                sep = " " if " " in tok else ""
+                continue
+            if d.textlength(cur + sep + tok, font=f) <= maxw:
+                cur = cur + sep + tok if cur else tok
+                continue
+            if cur: lines.append(cur); cur = ""
+            for ch in tok:   # mot trop long : coupe sans séparer une voyelle ou un ton de sa consonne
+                if ch in THAI_MARKS or d.textlength(cur + ch, font=f) <= maxw:
+                    cur += ch
+                else:
+                    lines.append(cur); cur = ch
+        return lines + [cur]
     if CJK:
         lines, cur = [], ""
         for ch in re.findall(r"[A-Za-z0-9][A-Za-z0-9.,%+\-]*|.", text.strip()):   # mots latins insécables
@@ -96,10 +134,12 @@ def page():
     g.ellipse((-420, H-480, 320, H+200), fill=tuple(int(c*0.28) for c in ACC))
     img = ImageChops.screen(img, glow.filter(ImageFilter.GaussianBlur(210)))
     d = ImageDraw.Draw(img)
-    f = font(True, 44); bw = sum(d.textlength(c, font=f) + 6 for c in UI["badge"]) - 6
+    f = font(True, 44)
+    sp_ = 0 if THAI else 6   # pas d'espacement lettre à lettre en thaï (voyelles et tons)
+    bw = d.textlength(UI["badge"], font=f) if THAI else sum(d.textlength(c, font=f) + 6 for c in UI["badge"]) - 6
     ph = int(92 * SCALE)
     d.rounded_rectangle((M, M + TOP, M + bw + 76, M + TOP + ph), radius=ph // 2, fill=ACC)
-    spaced(d, M + 38, M + TOP + int(20 * SCALE), UI["badge"], f, DARK, 6)
+    spaced(d, M + 38, M + TOP + int(20 * SCALE), UI["badge"], f, DARK, sp_) if not THAI else d.text((M + 38, M + TOP + int(20 * SCALE)), UI["badge"], font=f, fill=DARK)
     return img, d
 
 def footer(d, left, right):
@@ -167,17 +207,17 @@ def pages_spec():
             ft, fb = font(True, tsz), font(False, bsz)
             tl = wrap(d, n["titre"], ft, mw)
             lhb = int(fb.size * 1.41)
-            parts = [([n["tag"] if CJK else " ".join(n["tag"].upper())], ftag, ACC, sc(34), sc(28), False),
+            parts = [([n["tag"] if (CJK or THAI) else " ".join(n["tag"].upper())], ftag, ACC, sc(34), sc(28), False),
                      (tl, ft, WHITE, int(ft.size*1.08), sc(60 if bsz >= 40 else 48), False)]
             parts += [(wrap(d, p, fb, mw - sc(54)), fb, SOFT, lhb, sc(34 if bsz >= 40 else 28), True)
                       for p in n["points"]]
             h = sum(len(l) * lh + gap for l, f, c, lh, gap, b in parts) - parts[-1][4]
             if len(tl) <= 3 and h <= (H - BOT - 186) - (M + TOP + sc(132)):
                 break
-        specs.append((bg, parts, (UI["source"] + n["source"], "→"), list(range(2, len(parts) + 1))))
+        specs.append((bg, parts, (UI["source"] + n["source"], ">" if THAI else "→"), list(range(2, len(parts) + 1))))
     # --- récap + appel à l'action
     fh, fl, fc = font(True, 34), font(True, 50), font(True, 62)
-    parts = [(["".join(UI["recap"]) if CJK else " ".join(UI["recap"])], fh, ACC, sc(34), sc(40), False)]
+    parts = [(["".join(UI["recap"]) if (CJK or THAI) else " ".join(UI["recap"])], fh, ACC, sc(34), sc(40), False)]
     parts += [(wrap(d, n["titre"], fl, mw - sc(54)), fl, WHITE, sc(60), sc(26), True) for n in NEWS]
     parts[-1] = parts[-1][:4] + (sc(80), True)
     parts += [(wrap(d, UI["cta"], fc, mw), fc, ACC, sc(70), 0, False)]
@@ -204,7 +244,7 @@ for k, spec in enumerate(pages_spec(), 1):
     stages, prev_words = [], 0
     for s, upto in enumerate(spec[3], 1):
         p = os.path.join(RD, f"{k:02d}_{s}.png"); render(spec, upto).save(p)
-        words = sum((len("".join(l)) / 2.2) if CJK else len(" ".join(l).split()) for l, *_ in spec[1][:upto])
+        words = sum((len("".join(l)) / (2.2 if CJK else 6)) if (CJK or THAI) else len(" ".join(l).split()) for l, *_ in spec[1][:upto])
         new = words - prev_words; prev_words = words
         dur = 1.4 if (k == 1 and s == 1) else min(4.2, max(1.0, 0.5 + 0.19 * new))   # ~5 mots/s
         stages.append({"file": os.path.basename(p), "dur": round(dur, 2)})
